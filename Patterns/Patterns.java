@@ -1001,3 +1001,364 @@ public class Patterns {
         }
     }
 }
+
+// SORTINGS
+// 🔹 1. Bubble Sort
+// 📘 Notes
+// •	Simple algorithm → repeatedly compare adjacent elements and swap if needed.
+// •	Largest element “bubbles up” to the end in each pass.
+// •	Not practical for large input but good for learning basics.
+class BubbleSort {
+    public static void bubbleSort(int[] arr) {
+        int n = arr.length;
+        for (int i = 0; i < n - 1; i++) {
+            boolean swapped = false;
+            for (int j = 0; j < n - i - 1; j++) {
+                if (arr[j] > arr[j + 1]) {
+                    int temp = arr[j];
+                    arr[j] = arr[j + 1];
+                    arr[j + 1] = temp;
+                    swapped = true;
+                }
+            }
+            if (!swapped) break; // optimization
+        }
+    }
+}
+
+// ⏱ Time: Best O(n), Avg/Worst O(n²) | 🧮 Space: O(1) | ✅ Stable
+// 🔹 2. Selection Sort
+// 📘 Notes
+// •	Repeatedly select the minimum element from unsorted part → place in front.
+// •	Fewer swaps than bubble, but still O(n²).
+// •	Not stable (swapping breaks order).
+class SelectionSort {
+    public static void selectionSort(int[] arr) {
+        int n = arr.length;
+        for (int i = 0; i < n - 1; i++) {
+            int minIndex = i;
+            for (int j = i + 1; j < n; j++) {
+                if (arr[j] < arr[minIndex]) minIndex = j;
+            }
+            int temp = arr[minIndex];
+            arr[minIndex] = arr[i];
+            arr[i] = temp;
+        }
+    }
+}
+// ⏱ Time: Always O(n²) | 🧮 Space: O(1) | ❌ Not stable
+// 🔹 3. Insertion Sort
+// 📘 Notes
+// •	Works like sorting playing cards in hand.
+// •	Insert each element in the correct position of the sorted left side.
+// •	Efficient for small arrays or nearly sorted data.
+
+class InsertionSort {
+    public static void insertionSort(int[] arr) {
+        for (int i = 1; i < arr.length; i++) {
+            int key = arr[i];
+            int j = i - 1;
+            while (j >= 0 && arr[j] > key) {
+                arr[j + 1] = arr[j];
+                j--;
+            }
+            arr[j + 1] = key;
+        }
+    }
+}
+// ⏱ Time: Best O(n), Worst O(n²) | 🧮 Space: O(1) | ✅ Stable
+// 🔹 4. Merge Sort
+// 📘 Notes
+// •	Divide & Conquer → split array into halves → sort recursively → merge.
+// •	Always O(n log n), very reliable.
+// •	Requires extra space for merging.
+// •	Stable → maintains order of equal elements.
+class MergeSort {
+    public static void mergeSort(int[] arr, int left, int right) {
+        if (left < right) {
+            int mid = (left + right) / 2;
+            mergeSort(arr, left, mid);
+            mergeSort(arr, mid + 1, right);
+            merge(arr, left, mid, right);
+        }
+    }
+
+    private static void merge(int[] arr, int left, int mid, int right) {
+        int n1 = mid - left + 1, n2 = right - mid;
+        int[] L = new int[n1], R = new int[n2];
+        for (int i = 0; i < n1; i++) L[i] = arr[left + i];
+        for (int j = 0; j < n2; j++) R[j] = arr[mid + 1 + j];
+
+        int i = 0, j = 0, k = left;
+        while (i < n1 && j < n2) arr[k++] = (L[i] <= R[j]) ? L[i++] : R[j++];
+        while (i < n1) arr[k++] = L[i++];
+        while (j < n2) arr[k++] = R[j++];
+    }
+}
+// ⏱ Time: Always O(n log n) | 🧮 Space: O(n) | ✅ Stable
+// 🔹 5. Quick Sort
+// 📘 Notes
+// •	Divide & Conquer → choose pivot, partition elements, recursively sort.
+// •	Average O(n log n), but worst-case O(n²) (bad pivot).
+// •	In-place → low space usage.
+// •	Not stable.
+class QuickSort {
+    public static void quickSort(int[] arr, int low, int high) {
+        if (low < high) {
+            int pi = partition(arr, low, high);
+            quickSort(arr, low, pi - 1);
+            quickSort(arr, pi + 1, high);
+        }
+    }
+
+    private static int partition(int[] arr, int low, int high) {
+        int pivot = arr[high], i = low - 1;
+        for (int j = low; j < high; j++) {
+            if (arr[j] < pivot) {
+                i++;
+                int temp = arr[i]; arr[i] = arr[j]; arr[j] = temp;
+            }
+        }
+        int temp = arr[i + 1]; arr[i + 1] = arr[high]; arr[high] = temp;
+        return i + 1;
+    }
+}
+// ⏱ Time: Best/Avg O(n log n), Worst O(n²) | 🧮 Space: O(log n) | ❌ Not stable
+
+// Templates
+class AlgoTemplates {
+
+    // ---------------- BFS ----------------
+    public void bfs(int start, Map<Integer, List<Integer>> graph) {
+        Queue<Integer> queue = new LinkedList<>();
+        Set<Integer> visited = new HashSet<>();
+        queue.offer(start);
+        visited.add(start);
+
+        while (!queue.isEmpty()) {
+            int node = queue.poll();
+            // process node
+
+            for (int neighbor : graph.getOrDefault(node, new ArrayList<>())) {
+                if (!visited.contains(neighbor)) {
+                    visited.add(neighbor);
+                    queue.offer(neighbor);
+                }
+            }
+        }
+    }
+
+    // ---------------- DFS (Recursive) ----------------
+    public void dfsRecursive(int node, Map<Integer, List<Integer>> graph, Set<Integer> visited) {
+        if (visited.contains(node)) return;
+        visited.add(node);
+        // process node
+
+        for (int neighbor : graph.getOrDefault(node, new ArrayList<>())) {
+            dfsRecursive(neighbor, graph, visited);
+        }
+    }
+
+    // ---------------- DFS (Iterative) ----------------
+    public void dfsIterative(int start, Map<Integer, List<Integer>> graph) {
+        Stack<Integer> stack = new Stack<>();
+        Set<Integer> visited = new HashSet<>();
+        stack.push(start);
+
+        while (!stack.isEmpty()) {
+            int node = stack.pop();
+            if (visited.contains(node)) continue;
+            visited.add(node);
+            // process node
+
+            for (int neighbor : graph.getOrDefault(node, new ArrayList<>())) {
+                if (!visited.contains(neighbor)) {
+                    stack.push(neighbor);
+                }
+            }
+        }
+    }
+
+    // ---------------- Greedy Template ----------------
+    public void greedyExample(int[] nums) {
+        Arrays.sort(nums); // often sort first
+        int result = 0;
+        for (int num : nums) {
+            // make the greedy choice
+            result += num;
+        }
+        // return or process result
+    }
+
+    // ---------------- DP (Memoization) ----------------
+    public int fibMemo(int n, Map<Integer, Integer> memo) {
+        if (n <= 1) return n;
+        if (memo.containsKey(n)) return memo.get(n);
+        int val = fibMemo(n - 1, memo) + fibMemo(n - 2, memo);
+        memo.put(n, val);
+        return val;
+    }
+
+    // ---------------- DP (Tabulation) ----------------
+    public int fibTab(int n) {
+        if (n <= 1) return n;
+        int[] dp = new int[n + 1];
+        dp[0] = 0; dp[1] = 1;
+        for (int i = 2; i <= n; i++) {
+            dp[i] = dp[i - 1] + dp[i - 2];
+        }
+        return dp[n];
+    }
+
+    // ---------------- Knapsack (0/1) ----------------
+    public int knapsack(int[] weights, int[] values, int W) {
+        int n = weights.length;
+        int[][] dp = new int[n + 1][W + 1];
+
+        for (int i = 1; i <= n; i++) {
+            for (int w = 0; w <= W; w++) {
+                if (weights[i - 1] <= w) {
+                    dp[i][w] = Math.max(dp[i - 1][w],
+                                        values[i - 1] + dp[i - 1][w - weights[i - 1]]);
+                } else {
+                    dp[i][w] = dp[i - 1][w];
+                }
+            }
+        }
+        return dp[n][W];
+    }
+
+    // ---------------- Kadane’s Algorithm ----------------
+    public int kadane(int[] nums) {
+        int maxSoFar = nums[0], currMax = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            currMax = Math.max(nums[i], currMax + nums[i]);
+            maxSoFar = Math.max(maxSoFar, currMax);
+        }
+        return maxSoFar;
+    }
+
+    // ---------------- Topological Sort (Kahn’s Algorithm) ----------------
+    public List<Integer> topologicalSort(int n, Map<Integer, List<Integer>> graph) {
+        int[] indegree = new int[n];
+        for (int u : graph.keySet()) {
+            for (int v : graph.get(u)) {
+                indegree[v]++;
+            }
+        }
+
+        Queue<Integer> queue = new LinkedList<>();
+        for (int i = 0; i < n; i++) {
+            if (indegree[i] == 0) queue.offer(i);
+        }
+
+        List<Integer> result = new ArrayList<>();
+        while (!queue.isEmpty()) {
+            int u = queue.poll();
+            result.add(u);
+            for (int v : graph.getOrDefault(u, new ArrayList<>())) {
+                indegree[v]--;
+                if (indegree[v] == 0) queue.offer(v);
+            }
+        }
+        return result; // empty if cycle exists
+    }
+
+    // ---------------- Dijkstra’s Algorithm ----------------
+    public int[] dijkstra(int n, Map<Integer, List<int[]>> graph, int src) {
+        int[] dist = new int[n];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[src] = 0;
+
+        PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a[1]));
+        pq.offer(new int[]{src, 0});
+
+        while (!pq.isEmpty()) {
+            int[] curr = pq.poll();
+            int u = curr[0], d = curr[1];
+            if (d > dist[u]) continue;
+
+            for (int[] edge : graph.getOrDefault(u, new ArrayList<>())) {
+                int v = edge[0], w = edge[1];
+                if (dist[u] + w < dist[v]) {
+                    dist[v] = dist[u] + w;
+                    pq.offer(new int[]{v, dist[v]});
+                }
+            }
+        }
+        return dist;
+    }
+
+    // ---------------- Bellman-Ford Algorithm ----------------
+    public int[] bellmanFord(int n, int[][] edges, int src) {
+        int[] dist = new int[n];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[src] = 0;
+
+        for (int i = 0; i < n - 1; i++) {
+            for (int[] e : edges) {
+                int u = e[0], v = e[1], w = e[2];
+                if (dist[u] != Integer.MAX_VALUE && dist[u] + w < dist[v]) {
+                    dist[v] = dist[u] + w;
+                }
+            }
+        }
+        return dist; // if negative cycle: run one more iteration to detect
+    }
+
+    // ---------------- Floyd-Warshall Algorithm ----------------
+    public int[][] floydWarshall(int n, int[][] graph) {
+        int[][] dist = new int[n][n];
+        for (int i = 0; i < n; i++) {
+            dist[i] = Arrays.copyOf(graph[i], n);
+        }
+
+        for (int k = 0; k < n; k++) {
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (dist[i][k] != Integer.MAX_VALUE && dist[k][j] != Integer.MAX_VALUE) {
+                        dist[i][j] = Math.min(dist[i][j], dist[i][k] + dist[k][j]);
+                    }
+                }
+            }
+        }
+        return dist;
+    }
+
+    // ---------------- Trie (Prefix Tree) ----------------
+    class TrieNode {
+        Map<Character, TrieNode> children = new HashMap<>();
+        boolean isWord;
+    }
+
+    class Trie {
+        private final TrieNode root = new TrieNode();
+
+        public void insert(String word) {
+            TrieNode node = root;
+            for (char c : word.toCharArray()) {
+                node.children.putIfAbsent(c, new TrieNode());
+                node = node.children.get(c);
+            }
+            node.isWord = true;
+        }
+
+        public boolean search(String word) {
+            TrieNode node = root;
+            for (char c : word.toCharArray()) {
+                if (!node.children.containsKey(c)) return false;
+                node = node.children.get(c);
+            }
+            return node.isWord;
+        }
+
+        public boolean startsWith(String prefix) {
+            TrieNode node = root;
+            for (char c : prefix.toCharArray()) {
+                if (!node.children.containsKey(c)) return false;
+                node = node.children.get(c);
+            }
+            return true;
+        }
+    }
+}
